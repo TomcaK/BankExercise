@@ -186,7 +186,7 @@ public class Bank extends Thread {
                     file.createNewFile();
                 }
             }
-            System.out.println("****Daily report " + name + " created in " + sourceDirectoryPath + "****");
+            System.out.println("****Daily report " + name + " created in " + reportsDirectoryPath + "****");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -204,14 +204,14 @@ public class Bank extends Thread {
                 }
             });
             try {
-                Files.write(file.toPath(), ("-----------------------------------------------------------------------\n\n\n\n").getBytes(), StandardOpenOption.APPEND);
+                Files.write(file.toPath(), ("-----------------------------------------------------------------------\n\n\n").getBytes(), StandardOpenOption.APPEND);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
         try {
             if (!server.isEmpty()) {
-                Files.write(file.toPath(), ("\n\n\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n Awaiting orders \n").getBytes(), StandardOpenOption.APPEND);
+                Files.write(file.toPath(), ("\n\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n ****Awaiting orders****\n").getBytes(), StandardOpenOption.APPEND);
                 for (int i = 0; i < server.size(); i++) {
                     Files.write(file.toPath(), (server.get(i) + "\n").getBytes(), StandardOpenOption.APPEND);
                 }
