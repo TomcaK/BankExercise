@@ -1,5 +1,6 @@
 package cz.comkop.bankexercise.main;
 
+
 import cz.comkop.bankexercise.bank.Bank;
 
 public class Main {
@@ -14,6 +15,7 @@ public class Main {
         bankOrderGenerator.setGenerator(bank,time);
         bankOrderGenerator.start();
         bank.start();
-        time.run();
+        Thread t = new Thread(time);
+        t.start();
     }
 }

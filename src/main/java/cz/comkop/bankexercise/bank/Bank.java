@@ -1,8 +1,7 @@
 package cz.comkop.bankexercise.bank;
 
 
-import cz.comkop.bankexercise.main.Company;
-import cz.comkop.bankexercise.main.Person;
+
 import cz.comkop.bankexercise.main.Time;
 
 import java.io.File;
@@ -13,7 +12,10 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Matcher;
 
 public class Bank extends Thread {
     private BankServer server = new BankServer();
@@ -23,23 +25,23 @@ public class Bank extends Thread {
 
 
     public Bank() {
-        accounts.add(new Account(326714, 29000, AccountTypes.PERSONAL, new Person("Tomas", "Kopulety", LocalDate.of(1991, 11, 14))));
-        accounts.add(new Account(145978, 9640000, AccountTypes.COMPANY, new Company("Rene Kollar since 2001 s.r.o.", 1991)));
-        accounts.add(new Account(957145, 5000, AccountTypes.SAVING, new Person("Andrej", "Mazak", LocalDate.of(1973, 5, 3))));
-        accounts.add(new Account(788254, 84500, AccountTypes.PERSONAL, new Person("Jiri", "Zmeskal", LocalDate.of(1991, 6, 13))));
-        accounts.add(new Account(428714, 43000, AccountTypes.SAVING, new Person("Iveta", "Kopackova", LocalDate.of(1993, 11, 30))));
-        accounts.add(new Account(328514, 236000, AccountTypes.PERSONAL, new Person("Jakub", "Machu", LocalDate.of(1993, 5, 4))));
-        accounts.add(new Account(147247, 54000, AccountTypes.SAVING, new Person("Martina", "Fialova", LocalDate.of(1885, 1, 1))));
-        accounts.add(new Account(364782, 3000, AccountTypes.COMPANY, new Company("Verdammte Sägen", 2022)));
-        accounts.add(new Account(589316, 36741, AccountTypes.PERSONAL, new Person("Milos", "Docekal", LocalDate.of(1993, 5, 4))));
-        accounts.add(new Account(432967, 150000, AccountTypes.SAVING, new Person("Radka", "Hojgrova", LocalDate.of(1990, 2, 7))));
-        accounts.add(new Account(693214, 96300, AccountTypes.PERSONAL, new Person("Zdenka", "Havelkova", LocalDate.of(1984, 12, 24))));
-        accounts.add(new Account(249531, 2350000, AccountTypes.SAVING, new Person("Marcel", "Buday", LocalDate.of(1820, 3, 8))));
-        accounts.add(new Account(136974, 13000, AccountTypes.PERSONAL, new Person("Nikola", "Mrazova", LocalDate.of(1984, 12, 24))));
-        accounts.add(new Account(785496, 145000, AccountTypes.PERSONAL, new Person("Matus", "Bernart", LocalDate.of(1987, 4, 4))));
-        accounts.add(new Account(167589, 94000, AccountTypes.COMPANY, new Company("Raděj umřít než TAM pracovat s.r.o.", 2018)));
-        accounts.add(new Account(659287, 54000, AccountTypes.COMPANY, new Company("I hate my job inc.", 2018)));
-        accounts.add(new Account(769231, 21000, AccountTypes.COMPANY, new Company("Musím co nejdřív vypadnout z toho pekla a.s.", 2022)));
+        accounts.add(new Account(326714, 29000, Account.AccountType.PERSONAL, new Person("Tomas", "Kopulety", LocalDate.of(1991, 11, 14))));
+        accounts.add(new Account(145978, 9640000, Account.AccountType.COMPANY, new Company("Rene Kollar since 2001 s.r.o.", 1991)));
+        accounts.add(new Account(957145, 5000, Account.AccountType.SAVING, new Person("Andrej", "Mazak", LocalDate.of(1973, 5, 3))));
+        accounts.add(new Account(788254, 84500, Account.AccountType.PERSONAL, new Person("Jiri", "Zmeskal", LocalDate.of(1991, 6, 13))));
+        accounts.add(new Account(428714, 43000, Account.AccountType.SAVING, new Person("Iveta", "Kopackova", LocalDate.of(1993, 11, 30))));
+        accounts.add(new Account(328514, 236000, Account.AccountType.PERSONAL, new Person("Jakub", "Machu", LocalDate.of(1993, 5, 4))));
+        accounts.add(new Account(147247, 54000, Account.AccountType.SAVING, new Person("Martina", "Fialova", LocalDate.of(1885, 1, 1))));
+        accounts.add(new Account(364782, 3000, Account.AccountType.COMPANY, new Company("Verdammte Sägen", 2022)));
+        accounts.add(new Account(589316, 36741, Account.AccountType.PERSONAL, new Person("Milos", "Docekal", LocalDate.of(1993, 5, 4))));
+        accounts.add(new Account(432967, 150000, Account.AccountType.SAVING, new Person("Radka", "Hojgrova", LocalDate.of(1990, 2, 7))));
+        accounts.add(new Account(693214, 96300, Account.AccountType.PERSONAL, new Person("Zdenka", "Havelkova", LocalDate.of(1984, 12, 24))));
+        accounts.add(new Account(249531, 2350000, Account.AccountType.SAVING, new Person("Marcel", "Buday", LocalDate.of(1820, 3, 8))));
+        accounts.add(new Account(136974, 13000, Account.AccountType.PERSONAL, new Person("Nikola", "Mrazova", LocalDate.of(1984, 12, 24))));
+        accounts.add(new Account(785496, 145000, Account.AccountType.PERSONAL, new Person("Matus", "Bernart", LocalDate.of(1987, 4, 4))));
+        accounts.add(new Account(167589, 94000, Account.AccountType.COMPANY, new Company("Raděj umřít než TAM pracovat s.r.o.", 2018)));
+        accounts.add(new Account(659287, 54000, Account.AccountType.COMPANY, new Company("I hate my job inc.", 2018)));
+        accounts.add(new Account(769231, 21000, Account.AccountType.COMPANY, new Company("Musím co nejdřív vypadnout z toho pekla a.s.", 2022)));
     }
 
     public long getSumOfBalance() {
@@ -78,7 +80,6 @@ public class Bank extends Thread {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Insert amount of payment");
         int amount = scanner.nextInt();
-
         if (amount <= accounts.get(fromAccIndex).getBalance()) {
             orderOperations(new BankOrder
                     .BankOrderCreator()
@@ -171,43 +172,56 @@ public class Bank extends Thread {
 
     public void dailyReport(LocalDateTime dateTime) {
         String name = String.format("%s.txt", dateTime.format(DateTimeFormatter.ofPattern("d.M.y")));
-        Path path = Path.of(System.getProperty("user.dir") + "\\src\\main\\java\\cz\\comkop\\bankexercise\\" + name);
-        File file = path.toFile();
-
+        String separator = System.getProperty("file.separator");
+        List<Path> pathStream;
         try {
+            pathStream = Files.find(Path.of(System.getProperty("user.dir")), Integer.MAX_VALUE, (p, basicFileAttributes) ->
+                    p.getFileName().toString().equals("java")).toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String javaFile = !separator.equals("\\") ? pathStream.toString().replaceAll(Matcher.quoteReplacement("\\"), separator) : pathStream.toString();
+        String packagePath = !separator.equals("\\") ? this.getClass().getPackage().getName().replaceAll("\\.", separator) : this.getClass().getPackage().getName().replaceAll("\\.", Matcher.quoteReplacement("\\"));
+        javaFile = javaFile.replaceAll("\\[|\\]", "").concat(separator);
+        Path directoryPath = Path.of(javaFile + packagePath + separator + "reports");
+        File file = new File(directoryPath.toString(), name);
+        try {
+            if (!Files.exists(directoryPath)) {
+                Files.createDirectory(directoryPath);
+            }
             if (!file.createNewFile()) {
                 if (file.delete()) {
                     file.createNewFile();
                 }
             }
-            System.out.println("****Daily report " + name + " created****");
+            System.out.println("****Daily report " + name + " created in " + directoryPath + "****");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        accounts.stream().forEach(account -> {
+        accounts.forEach(account -> {
             try {
-                Files.write(path, (account.getOwner().getClass().getSimpleName() + " " + account.getOwner().getName() + "\n" + account + "\n****Today's orders****\n").getBytes(), StandardOpenOption.APPEND);
+                Files.write(file.toPath(), (account.getOwner().getClass().getSimpleName() + " " + account.getOwner().getName() + "\n" + account + "\n****Today's orders****\n").getBytes(), StandardOpenOption.APPEND);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
             account.getHistoryOfPayments().stream().filter(bankOrder -> bankOrder.getTime().toLocalDate() == dateTime.toLocalDate()).forEach(bankOrder -> {
                 try {
-                    Files.write(path, (bankOrder + "\n").getBytes(), StandardOpenOption.APPEND);
+                    Files.write(file.toPath(), (bankOrder + "\n").getBytes(), StandardOpenOption.APPEND);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             });
             try {
-                Files.write(path, ("-----------------------------------------------------------------------\n\n\n\n").getBytes(), StandardOpenOption.APPEND);
+                Files.write(file.toPath(), ("-----------------------------------------------------------------------\n\n\n\n").getBytes(), StandardOpenOption.APPEND);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
         try {
             if (!server.isEmpty()) {
-                Files.write(path, ("\n\n\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n Awaiting orders \n").getBytes(), StandardOpenOption.APPEND);
+                Files.write(file.toPath(), ("\n\n\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n Awaiting orders \n").getBytes(), StandardOpenOption.APPEND);
                 for (int i = 0; i < server.size(); i++) {
-                    Files.write(path, (server.get(i) + "\n").getBytes(), StandardOpenOption.APPEND);
+                    Files.write(file.toPath(), (server.get(i) + "\n").getBytes(), StandardOpenOption.APPEND);
                 }
 
             }

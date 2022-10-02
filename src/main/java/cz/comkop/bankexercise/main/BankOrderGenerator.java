@@ -1,6 +1,8 @@
 package cz.comkop.bankexercise.main;
 
 
+
+
 import cz.comkop.bankexercise.bank.Account;
 import cz.comkop.bankexercise.bank.Bank;
 import cz.comkop.bankexercise.bank.BankOrder;
@@ -27,7 +29,8 @@ public class BankOrderGenerator extends Thread {
                     System.out.println("bank.Bank Generator Thread sleeps");
                 }
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                //nic se nedeje, tak pospim o neco mene
+               // throw new RuntimeException(e);
             }
             randomTypes = random.nextInt(1, 4);
             Account from;

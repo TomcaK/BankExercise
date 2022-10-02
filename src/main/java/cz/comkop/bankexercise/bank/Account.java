@@ -7,13 +7,18 @@ import java.util.List;
 public class Account {
     private int number;
     private long balance;
-    private AccountTypes type;
+
+    public enum AccountType {
+        SAVING, PERSONAL, COMPANY
+    }
+
+    private AccountType type;
     private double interestRate;
     private Owner owner;
     private List<BankOrder> historyOfBankOrders;
 
 
-    public Account(int number, long balance, AccountTypes type, Owner owner) {
+    public Account(int number, long balance, AccountType type, Owner owner) {
         this.number = number;
         this.balance = balance;
         this.type = type;
@@ -22,8 +27,8 @@ public class Account {
         historyOfBankOrders = new ArrayList<>();
     }
 
-    private double setInterestRate(AccountTypes type){
-        return switch (type){
+    private double setInterestRate(AccountType type) {
+        return switch (type) {
             case SAVING -> 6.2d;
             case COMPANY -> 2.6d;
             case PERSONAL -> 0.5d;
@@ -38,8 +43,8 @@ public class Account {
         this.balance = balance;
     }
 
-    public double getYearInterest(){
-        return  ((double)balance / 100.00) * interestRate;
+    public double getYearInterest() {
+        return ((double) balance / 100.00) * interestRate;
     }
 
     public int getNumber() {
@@ -49,7 +54,7 @@ public class Account {
 
     @Override
     public String toString() {
-        return String.format("Account number: %s, balance: %d Kč, type of account: %s, interest rate percentage of account: %s ",number,balance,type,interestRate);
+        return String.format("Account number: %s, balance: %d Kč, type of account: %s, interest rate percentage of account: %s ", number, balance, type, interestRate);
     }
 
     public Owner getOwner() {

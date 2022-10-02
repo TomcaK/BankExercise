@@ -1,7 +1,4 @@
-package cz.comkop.bankexercise.main;
-
-
-import cz.comkop.bankexercise.bank.Owner;
+package cz.comkop.bankexercise.bank;
 
 import java.time.LocalDate;
 

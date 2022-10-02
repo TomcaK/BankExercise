@@ -1,7 +1,6 @@
 package cz.comkop.bankexercise.main;
 
 
-
 import cz.comkop.bankexercise.bank.Bank;
 
 import java.time.LocalDate;
@@ -23,28 +22,30 @@ public class Time implements Runnable {
     public void run() {
         System.out.println(time.format(formatter2));
         while (true) {
-            if (System.currentTimeMillis() > millis + hour) {
-                time = time.plusHours(1);
-                millis = System.currentTimeMillis();
-                if (time.getHour() == 0) {
-                    System.out.println(time.format(formatter2));
-                } else {
-                    System.out.println(time.format(formatter));
+            try {
+                Thread.sleep(hour);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            time = time.plusHours(1);
+            if (time.getHour() == 0) {
+                System.out.println(time.format(formatter2));
+            } else {
+                System.out.println(time.format(formatter));
+            }
+            if (time.getHour() >= 7 && time.getHour() <= 18) {
+                if (!Bank.isOpened()) {
+                    System.out.println("****Good Morning!!!****");
+                    System.out.println("****BANK OPENED****");
                 }
-                if (time.getHour() >= 7 && time.getHour() <= 18) {
-                    if (!Bank.isOpened()) {
-                        System.out.println("****Good Morning!!!****");
-                        System.out.println("****BANK OPENED****");
-                    }
-                    bank.setOpen(true);
-                } else {
-                    if (Bank.isOpened()) {
-                        System.out.println("****Have a nice evening!!!****");
-                        System.out.println("****BANK CLOSED****");
-                        bank.dailyReport(time);
-                    }
-                    bank.setOpen(false);
+                bank.setOpen(true);
+            } else {
+                if (Bank.isOpened()) {
+                    System.out.println("****Have a nice evening!!!****");
+                    System.out.println("****BANK CLOSED****");
+                    bank.dailyReport(time);
                 }
+                bank.setOpen(false);
             }
         }
     }

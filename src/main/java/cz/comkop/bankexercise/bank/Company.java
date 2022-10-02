@@ -1,7 +1,4 @@
-package cz.comkop.bankexercise.main;
-
-
-import cz.comkop.bankexercise.bank.Owner;
+package cz.comkop.bankexercise.bank;
 
 public class Company extends Owner {
     private String name;
