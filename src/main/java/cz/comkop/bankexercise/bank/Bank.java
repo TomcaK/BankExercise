@@ -1,7 +1,6 @@
 package cz.comkop.bankexercise.bank;
 
 
-
 import cz.comkop.bankexercise.main.Time;
 
 import java.io.File;
@@ -173,17 +172,10 @@ public class Bank extends Thread {
     public void dailyReport(LocalDateTime dateTime) {
         String name = String.format("%s.txt", dateTime.format(DateTimeFormatter.ofPattern("d.M.y")));
         String separator = System.getProperty("file.separator");
-        List<Path> pathStream;
-        try {
-            pathStream = Files.find(Path.of(System.getProperty("user.dir")), Integer.MAX_VALUE, (p, basicFileAttributes) ->
-                    p.getFileName().toString().equals("java")).toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        String javaFile = !separator.equals("\\") ? pathStream.toString().replaceAll(Matcher.quoteReplacement("\\"), separator) : pathStream.toString();
+        String sourceDirectoryPath = "src\\main\\java\\";
+        sourceDirectoryPath = !separator.equals("\\") ? sourceDirectoryPath.replaceAll(Matcher.quoteReplacement("\\"), separator) : sourceDirectoryPath;
         String packagePath = !separator.equals("\\") ? this.getClass().getPackage().getName().replaceAll("\\.", separator) : this.getClass().getPackage().getName().replaceAll("\\.", Matcher.quoteReplacement("\\"));
-        javaFile = javaFile.replaceAll("\\[|\\]", "").concat(separator);
-        Path directoryPath = Path.of(javaFile + packagePath + separator + "reports");
+        Path directoryPath = Path.of(sourceDirectoryPath + packagePath + separator + "reports");
         File file = new File(directoryPath.toString(), name);
         try {
             if (!Files.exists(directoryPath)) {
