@@ -172,21 +172,21 @@ public class Bank extends Thread {
     public void dailyReport(LocalDateTime dateTime) {
         String name = String.format("%s.txt", dateTime.format(DateTimeFormatter.ofPattern("d.M.y")));
         String separator = System.getProperty("file.separator");
-        String sourceDirectoryPath = "src\\main\\java\\";
+        String sourceDirectoryPath = System.getProperty("user.dir") + "\\src\\main\\java\\";
         sourceDirectoryPath = !separator.equals("\\") ? sourceDirectoryPath.replaceAll(Matcher.quoteReplacement("\\"), separator) : sourceDirectoryPath;
-        String packagePath = !separator.equals("\\") ? this.getClass().getPackage().getName().replaceAll("\\.", separator) : this.getClass().getPackage().getName().replaceAll("\\.", Matcher.quoteReplacement("\\"));
-        Path directoryPath = Path.of(sourceDirectoryPath + packagePath + separator + "reports");
-        File file = new File(directoryPath.toString(), name);
+        String packagePath = getClass().getPackage().getName().replaceAll("\\.", Matcher.quoteReplacement(separator));
+        Path reportsDirectoryPath = Path.of(sourceDirectoryPath + packagePath + separator + "reports");
+        File file = new File(reportsDirectoryPath.toString(), name);
         try {
-            if (!Files.exists(directoryPath)) {
-                Files.createDirectory(directoryPath);
+            if (!Files.exists(reportsDirectoryPath)) {
+                Files.createDirectory(reportsDirectoryPath);
             }
             if (!file.createNewFile()) {
                 if (file.delete()) {
                     file.createNewFile();
                 }
             }
-            System.out.println("****Daily report " + name + " created in " + directoryPath + "****");
+            System.out.println("****Daily report " + name + " created in " + sourceDirectoryPath + "****");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
