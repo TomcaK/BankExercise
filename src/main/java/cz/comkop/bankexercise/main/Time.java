@@ -2,7 +2,6 @@ package cz.comkop.bankexercise.main;
 
 
 import cz.comkop.bankexercise.bank.Bank;
-import cz.comkop.bankexercise.main.ui.UI;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,14 +16,14 @@ public class Time implements Runnable {
     private int hour = 2000;
     private LocalDateTime time = LocalDateTime.of(LocalDate.now(), LocalTime.of(LocalTime.now().getHour(), 00));
     private long millis = System.currentTimeMillis();
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
-    private DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("H:mm d.M.y");
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+    private DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("HH:mm d.M.y");
 
     @Override
     public void run() {
         System.out.println(time.format(formatter2));
         while (true) {
-            ui.setTimeLabel(time.format(formatter));
+            ui.setTimeLabel(time.format(formatter2));
             try {
                 Thread.sleep(hour);
             } catch (InterruptedException e) {
@@ -37,17 +36,17 @@ public class Time implements Runnable {
                 System.out.println(time.format(formatter));
             }
             if (time.getHour() >= 7 && time.getHour() <= 18) {
+                ui.setOpenCloseLabel("OPENED");
                 if (!Bank.isOpened()) {
                     System.out.println("****Good Morning!!!****");
                     System.out.println("****BANK OPENED****");
-                    ui.setOpenCloseLabel("OPENED");
                 }
                 bank.setOpen(true);
             } else {
+                ui.setOpenCloseLabel("CLOSED");
                 if (Bank.isOpened()) {
                     System.out.println("****Have a nice evening!!!****");
                     System.out.println("****BANK CLOSED****");
-                    ui.setOpenCloseLabel("CLOSED");
                     bank.dailyReport(time);
                 }
                 bank.setOpen(false);

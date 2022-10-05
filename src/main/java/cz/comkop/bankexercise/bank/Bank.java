@@ -2,7 +2,7 @@ package cz.comkop.bankexercise.bank;
 
 
 import cz.comkop.bankexercise.main.Time;
-import cz.comkop.bankexercise.main.ui.UI;
+import cz.comkop.bankexercise.main.UI;
 
 import java.io.File;
 import java.io.IOException;
@@ -110,6 +110,7 @@ public class Bank extends Thread {
                 long balanceBefore = bankOrder.getTo().getBalance();
                 increaseBalance(bankOrder);
                 owner = bankOrder.getTo().getOwner();
+                ui.addRow(true, bankOrder, balanceBefore, bankOrder.getTo().getBalance());
                 System.out.printf("%s %s deposits %s Kč to account n.%s. Account balance before order: %s Kč. New account balance: %s Kč\n", owner.getClass().getSimpleName(), owner.getName(), bankOrder.getAmount(), bankOrder.getTo().getNumber(), balanceBefore, bankOrder.getTo().getBalance());
             }
             case PAYMENT -> {
@@ -118,6 +119,7 @@ public class Bank extends Thread {
                 increaseBalance(bankOrder);
                 owner = bankOrder.getFrom().getOwner();
                 Owner owner2 = bankOrder.getTo().getOwner();
+                ui.addRow(true, bankOrder, balanceBefore, bankOrder.getFrom().getBalance());
                 System.out.printf("%s %s sends %s Kč from account n.%s to %s, account n.%s. Account balance before order: %s Kč. New account balance: %s Kč\n", owner.getClass().getSimpleName(), owner.getName(), bankOrder.getAmount(), bankOrder.getFrom().getNumber(), owner2.getName(), bankOrder.getTo().getNumber(), balanceBefore, bankOrder.getFrom().getBalance());
 
             }
@@ -125,6 +127,7 @@ public class Bank extends Thread {
                 long balanceBefore = bankOrder.getFrom().getBalance();
                 decreaseBalance(bankOrder);
                 owner = bankOrder.getFrom().getOwner();
+                ui.addRow(true, bankOrder, balanceBefore, bankOrder.getFrom().getBalance());
                 System.out.printf("%s %s withdraws %s Kč from account n.%s. Account balance before order: %s Kč. New account balance: %s Kč\n", owner.getClass().getSimpleName(), owner.getName(), bankOrder.getAmount(), bankOrder.getFrom().getNumber(), balanceBefore, bankOrder.getFrom().getBalance());
             }
         }
@@ -232,9 +235,13 @@ public class Bank extends Thread {
             int count = 0;
             for (int i = 0; i < server.size(); i++) {
                 if (checkBalance(server.get(i)) && orderOperations(server.get(i))) {
+                    ui.removeRow(server.get(i).getId());
                     server.operationComplete(i);
+
                     i--;
                     count++;
+                } else if (!ui.doesRowExist(server.get(i).getId())) {
+                    ui.addRow(false, server.get(i), 0, 0);
                 }
             }
             System.out.printf("Orders processed: %s\n\n", count);

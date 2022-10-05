@@ -50,6 +50,10 @@ public class BankOrder {
         return type;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public LocalDateTime getTime() {
         return time;
     }
