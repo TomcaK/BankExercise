@@ -2,6 +2,7 @@ package cz.comkop.bankexercise.bank;
 
 
 import cz.comkop.bankexercise.main.Time;
+import cz.comkop.bankexercise.main.ui.UI;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +22,7 @@ public class Bank extends Thread {
     private List<Account> accounts = new ArrayList<>();
     private static boolean opened;
     private Time time;
+    private UI ui;
 
 
     public Bank() {
@@ -243,8 +245,9 @@ public class Bank extends Thread {
         return server;
     }
 
-    public void setTime(Time time) {
+    public void setAll(Time time, UI ui) {
         this.time = time;
+        this.ui = ui;
     }
 }
 

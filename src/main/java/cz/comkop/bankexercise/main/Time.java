@@ -2,6 +2,7 @@ package cz.comkop.bankexercise.main;
 
 
 import cz.comkop.bankexercise.bank.Bank;
+import cz.comkop.bankexercise.main.ui.UI;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,7 +10,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class Time implements Runnable {
-    Bank bank;
+    private Bank bank;
+    private UI ui;
 
 
     private int hour = 2000;
@@ -22,6 +24,7 @@ public class Time implements Runnable {
     public void run() {
         System.out.println(time.format(formatter2));
         while (true) {
+            ui.setTimeLabel(time.format(formatter));
             try {
                 Thread.sleep(hour);
             } catch (InterruptedException e) {
@@ -37,12 +40,14 @@ public class Time implements Runnable {
                 if (!Bank.isOpened()) {
                     System.out.println("****Good Morning!!!****");
                     System.out.println("****BANK OPENED****");
+                    ui.setOpenCloseLabel("OPENED");
                 }
                 bank.setOpen(true);
             } else {
                 if (Bank.isOpened()) {
                     System.out.println("****Have a nice evening!!!****");
                     System.out.println("****BANK CLOSED****");
+                    ui.setOpenCloseLabel("CLOSED");
                     bank.dailyReport(time);
                 }
                 bank.setOpen(false);
@@ -50,8 +55,9 @@ public class Time implements Runnable {
         }
     }
 
-    public void setBank(Bank bank) {
+    public void setAll(Bank bank, UI ui) {
         this.bank = bank;
+        this.ui = ui;
     }
 
     public LocalDateTime getTime() {
