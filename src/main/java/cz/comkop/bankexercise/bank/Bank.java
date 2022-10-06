@@ -242,6 +242,7 @@ public class Bank extends Thread {
             System.out.printf("Awaiting orders: %s\n", size);
             int count = 0;
             for (int i = 0; i < server.size(); i++) {
+                ui.changeBalance(server.get(i));
                 if (checkBalance(server.get(i)) && orderOperations(server.get(i))) {
                     ui.changeBalance(server.get(i));
                     ui.removeRow(server.get(i).getId());
