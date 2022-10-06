@@ -177,10 +177,9 @@ public class Bank extends Thread {
     public void dailyReport(LocalDateTime dateTime) {
         String name = String.format("%s.txt", dateTime.format(DateTimeFormatter.ofPattern("d.M.y")));
         String separator = System.getProperty("file.separator");
-        String sourceDirectoryPath = System.getProperty("user.dir") + "\\src\\main\\java\\";
+        String sourceDirectoryPath = System.getProperty("user.dir") + separator;
         sourceDirectoryPath = !separator.equals("\\") ? sourceDirectoryPath.replaceAll(Matcher.quoteReplacement("\\"), separator) : sourceDirectoryPath;
-        String packagePath = getClass().getPackage().getName().replaceAll("\\.", Matcher.quoteReplacement(separator));
-        Path reportsDirectoryPath = Path.of(sourceDirectoryPath + packagePath + separator + "reports");
+        Path reportsDirectoryPath = Path.of(sourceDirectoryPath + separator + "reports");
         File file = new File(reportsDirectoryPath.toString(), name);
         try {
             if (!Files.exists(reportsDirectoryPath)) {
@@ -227,13 +226,13 @@ public class Bank extends Thread {
         }
     }
 
-    public void sendMoney(String[] data){
-        for (Account acc: accounts) {
-               if (acc.getOwner().getName().equals(data[0])){
-                   server.addOrder(acc,Integer.parseInt(data[1]));
-                   break;
-               }
+    public void sendMoney(String[] data) {
+        for (Account acc : accounts) {
+            if (acc.getOwner().getName().equals(data[0])) {
+                server.addOrder(acc, Integer.parseInt(data[1]));
+                break;
             }
+        }
     }
 
     private void paymentListener() {
@@ -265,7 +264,6 @@ public class Bank extends Thread {
         this.time = time;
         this.ui = ui;
     }
-
 
 
 }
