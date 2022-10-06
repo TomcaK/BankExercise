@@ -13,6 +13,7 @@ public class Main {
     public static void main(String[] args) {
         time.setAll(bank,ui);
         bank.setAll(time,ui);
+        ui.setAll(bank);
         bankOrderGenerator.setGenerator(bank,time);
         bankOrderGenerator.start();
         bank.start();

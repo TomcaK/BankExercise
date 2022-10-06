@@ -1,5 +1,6 @@
 package cz.comkop.bankexercise.main;
 
+import cz.comkop.bankexercise.bank.Bank;
 import cz.comkop.bankexercise.bank.BankOrder;
 
 import javax.swing.*;
@@ -20,10 +21,17 @@ public class UI extends Thread {
     private JTable processedOrdersTable;
     private DefaultTableModel awaitingOrdersModel;
     private DefaultTableModel processedOrdersModel;
-    private String[] columnNamesAwaiting = new String[]{"Time", "ID", "Type", "Amount", "From", "To", "Balance"};
-    private String[] columnNamesProcessed = new String[]{"Time", "ID", "Type", "Amount", "From", "To", "Balance before", "Balance after"};
+    private final String[] columnNamesAwaiting = new String[]{"Time", "ID", "Type", "Amount", "From", "To", "Balance"};
+    private final String[] columnNamesProcessed = new String[]{"Time", "ID", "Type", "Amount", "From", "To", "Balance before", "Balance after"};
     private JScrollPane jScrollPaneAwaiting;
     private JScrollPane jScrollPaneProcessed;
+    private JTextField nameTextField;
+    private JTextField amountTextField;
+    private JButton sendMoneyButton;
+    private JLabel sendMoneyText = new JLabel("Send money");
+    private Bank bank;
+    private String[] sendMoneyData;
+
 
 
     public UI() {
@@ -31,6 +39,7 @@ public class UI extends Thread {
         setClock();
         setBankInfo();
         setTables();
+        setMoneySender();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         container.add(timeText);
         container.add(timeLabel);
@@ -40,6 +49,10 @@ public class UI extends Thread {
         container.add(processedOrdersText);
         container.add(jScrollPaneAwaiting);
         container.add(jScrollPaneProcessed);
+        container.add(sendMoneyButton);
+        container.add(sendMoneyText);
+        container.add(amountTextField);
+        container.add(nameTextField);
         frame.setSize(1900, 1000);
         frame.setVisible(true);
     }
@@ -80,6 +93,30 @@ public class UI extends Thread {
         }
         return false;
     }
+
+    public void setMoneySender(){
+        amountTextField = new JTextField("Amount");
+        nameTextField = new JTextField("Name");
+        sendMoneyButton = new JButton("Send");
+        sendMoneyText.setBounds(400,500,100,20);
+        nameTextField.setBounds(400,520,100,20);
+        amountTextField.setBounds(400,540,100,20);
+        sendMoneyButton.setBounds(400,560,100,20);
+        sendMoneyButton.addActionListener((e)->{
+            sendMoneyData = new String[]{nameTextField.getText(),amountTextField.getText()};
+            bank.sendMoney(sendMoneyData);
+            //sendMoneyData = null;
+        });
+    }
+
+    public void setAll(Bank bank){
+        this.bank = bank;
+}
+
+
+
+
+
 
 
     public void addRow(boolean processed, BankOrder bankOrder, long before, long after) {

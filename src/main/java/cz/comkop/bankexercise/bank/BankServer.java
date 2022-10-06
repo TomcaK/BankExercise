@@ -1,5 +1,6 @@
 package cz.comkop.bankexercise.bank;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +22,10 @@ public class BankServer {
 
     public Integer size() {
         return awaitingBankOrders.size();
+    }
+
+    public void addOrder(Account to,int amount){
+        awaitingBankOrders.add(new BankOrder(0,amount,null,to, LocalDateTime.now()));
     }
 
     public boolean operationComplete(int index) {

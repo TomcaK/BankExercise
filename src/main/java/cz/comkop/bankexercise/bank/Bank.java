@@ -227,6 +227,14 @@ public class Bank extends Thread {
         }
     }
 
+    public void sendMoney(String[] data){
+        for (Account acc: accounts) {
+               if (acc.getOwner().getName().equals(data[0])){
+                   server.addOrder(acc,Integer.parseInt(data[1]));
+                   break;
+               }
+            }
+    }
 
     private void paymentListener() {
         if (!server.isEmpty()) {
@@ -256,6 +264,9 @@ public class Bank extends Thread {
         this.time = time;
         this.ui = ui;
     }
+
+
+
 }
 
 
