@@ -102,6 +102,17 @@ public class UI extends Thread {
         }
     }
 
+    public void changeBalance(BankOrder order) {
+        for (int i = 0; i < awaitingOrdersModel.getRowCount(); i++) {
+            if (order.getFrom() != null && awaitingOrdersModel.getValueAt(i, 4).equals(order.getFrom().getOwner().getName())) {
+                awaitingOrdersModel.setValueAt(order.getFrom().getBalance(), i, 6);
+            }
+            if (order.getTo() != null && awaitingOrdersModel.getValueAt(i, 4).equals(order.getTo().getOwner().getName())) {
+                awaitingOrdersModel.setValueAt(order.getTo().getBalance(), i, 6);
+            }
+        }
+    }
+
     public void setTimeLabel(String s) {
         timeLabel.setText(s);
     }

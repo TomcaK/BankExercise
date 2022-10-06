@@ -47,14 +47,13 @@ public class BankOrderGenerator extends Thread {
             }
             BankOrder order = new BankOrder
                     .BankOrderCreator()
-                    .setId(id)
+                    .setId(id++)
                     .setAmount(random.nextInt(1, 20000))
                     .setFrom(from)
                     .setTo(to)
                     .setTime(time.getTime())
                     .createBankOrder();
             server.receive(order);
-            id++;
             if (Main.debug) {
                 System.out.println("Event created");
                 System.out.println(order);

@@ -235,9 +235,9 @@ public class Bank extends Thread {
             int count = 0;
             for (int i = 0; i < server.size(); i++) {
                 if (checkBalance(server.get(i)) && orderOperations(server.get(i))) {
+                    ui.changeBalance(server.get(i));
                     ui.removeRow(server.get(i).getId());
                     server.operationComplete(i);
-
                     i--;
                     count++;
                 } else if (!ui.doesRowExist(server.get(i).getId())) {
