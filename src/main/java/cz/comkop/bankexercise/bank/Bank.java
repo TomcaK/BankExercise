@@ -74,6 +74,7 @@ public class Bank extends Thread {
                 server.receive(BankOrder.builder()
                         .setTo(acc)
                         .setAmount(Integer.parseInt(data[1]))
+                        .setTime(time.getTime())
                         .build());
                 break;
             }
@@ -94,7 +95,7 @@ public class Bank extends Thread {
         System.out.println("Insert amount of payment");
         int amount = scanner.nextInt();
         if (amount <= accounts.get(fromAccIndex).getBalance()) {
-            orderOperations (BankOrder.builder()
+            orderOperations(BankOrder.builder()
                     .setAmount(amount)
                     .setFrom(accounts.get(fromAccIndex))
                     .setTo(accounts.get(toAccIndex))
@@ -116,14 +117,9 @@ public class Bank extends Thread {
         bankOrder.setTime(time.getTime());
         Owner owner1 = bankOrder.getFrom() != null ? bankOrder.getFrom().getOwner() : null;
         Owner owner2 = bankOrder.getTo() != null ? bankOrder.getTo().getOwner() : null;
-        long balanceBefore;
-        if (bankOrder.getType().equals(BankOrder.OrderType.WITHDRAW) || bankOrder.getType().equals(BankOrder.OrderType.PAYMENT)) {
-            balanceBefore = bankOrder.getFrom().getBalance();
-            ui.addRow(true, bankOrder, balanceBefore, bankOrder.getFrom().getBalance());
-        } else {
-            balanceBefore = bankOrder.getTo().getBalance();
-            ui.addRow(true, bankOrder, balanceBefore, bankOrder.getTo().getBalance());
-        }
+        long balanceBefore = bankOrder.getType().equals(BankOrder.OrderType.WITHDRAW)
+                || bankOrder.getType().equals(BankOrder.OrderType.PAYMENT) ? bankOrder.getFrom().getBalance() : bankOrder.getTo().getBalance();
+
         switch (bankOrder.getType()) {
             case DEPOSIT -> {
                 increaseBalance(bankOrder);
@@ -133,13 +129,20 @@ public class Bank extends Thread {
                 decreaseBalance(bankOrder);
                 increaseBalance(bankOrder);
                 System.out.printf("%s %s sends %s Kč from account n.%s to %s, account n.%s. Account balance before order: %s Kč. New account balance: %s Kč\n", owner1.getClass().getSimpleName(), owner1.getName(), bankOrder.getAmount(), bankOrder.getFrom().getNumber(), owner2.getName(), bankOrder.getTo().getNumber(), balanceBefore, bankOrder.getFrom().getBalance());
-
             }
             case WITHDRAW -> {
                 decreaseBalance(bankOrder);
                 System.out.printf("%s %s withdraws %s Kč from account n.%s. Account balance before order: %s Kč. New account balance: %s Kč\n", owner1.getClass().getSimpleName(), owner1.getName(), bankOrder.getAmount(), bankOrder.getFrom().getNumber(), balanceBefore, bankOrder.getFrom().getBalance());
             }
         }
+        rewriteTableData(bankOrder, balanceBefore);
+    }
+
+    private void rewriteTableData(BankOrder bankOrder, long balanceBefore) {
+        long balanceAfter = bankOrder.getType().equals(BankOrder.OrderType.WITHDRAW)
+                || bankOrder.getType().equals(BankOrder.OrderType.PAYMENT) ? bankOrder.getFrom().getBalance()
+                : bankOrder.getTo().getBalance();
+        ui.addRow(true, bankOrder, balanceBefore, balanceAfter);
     }
 
     public void decreaseBalance(BankOrder bankOrder) {
@@ -236,21 +239,33 @@ public class Bank extends Thread {
             int size = server.size();
             System.out.printf("Awaiting orders: %s\n", size);
             int count = 0;
-            for (int i = 0; i < server.size(); i++) {
-                ui.changeBalance(server.get(i));
-                if (checkBalance(server.get(i))) {
-                    orderOperations(server.get(i));
-                    ui.removeRow(server.get(i).getId());
-                    server.operationComplete(i);
-                    i--;
-                    count++;
-                } else if (!ui.doesRowExist(server.get(i).getId())) {
-                    ui.addRow(false, server.get(i), 0, 0);
+            server.getAwaitingBankOrders().forEach(bankOrder -> {
+                if (checkBalance(bankOrder)) {
+                    orderOperations(bankOrder);
+                    bankOrder.setProcessed(true);
+                    ui.removeRow(bankOrder.getId());
+                } else if (!ui.doesRowExist(bankOrder.getId())) {
+                    ui.addRow(false, bankOrder, 0, 0);
                 }
-            }
-            System.out.printf("Orders processed: %s\n\n", count);
+            });
+            server.removeProcessedOrder();
+
+//            for (int i = 0; i < server.size(); i++) {
+//
+//                if (checkBalance(server.get(i))) {
+//                    orderOperations(server.get(i));
+//                    server.removeProcessedOrders(i);
+//                    i--;
+//                    count++;
+//                } else if (!ui.doesRowExist(server.get(i).getId())) {
+//                    ui.addRow(false, server.get(i), 0, 0);
+//                }
+//            }
+          //  System.out.printf("Orders processed: %s\n\n", count);
         }
     }
+
+
 
     public void setInstances(Time time, UI ui) {
         this.time = time;

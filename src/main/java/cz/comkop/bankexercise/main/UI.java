@@ -8,15 +8,16 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
 
+import static cz.comkop.bankexercise.main.Time.*;
+
 public class UI extends Thread {
-    private JFrame frame = new JFrame("Bank Exercise");
-    private JLabel timeLabel = new JLabel();
-    private JLabel timeText = new JLabel("Time");
-    private JLabel bankText = new JLabel("Bank");
-    private JLabel openClosedText = new JLabel();
-    private JLabel awaitingOrdersText = new JLabel("Awaiting orders");
-    private JLabel processedOrdersText = new JLabel("Processed orders");
-    private Container container = frame.getContentPane();
+    private final JFrame frame = new JFrame("Bank Exercise");
+    private final JLabel timeLabel = new JLabel();
+    private final JLabel timeText = new JLabel("Time");
+    private final JLabel bankText = new JLabel("Bank");
+    private final JLabel openClosedText = new JLabel();
+    private final JLabel awaitingOrdersText = new JLabel("Awaiting orders");
+    private final JLabel processedOrdersText = new JLabel("Processed orders");
     private JTable awaitingOrdersTable;
     private JTable processedOrdersTable;
     private DefaultTableModel awaitingOrdersModel;
@@ -28,12 +29,13 @@ public class UI extends Thread {
     private JTextField nameTextField;
     private JTextField amountTextField;
     private JButton sendMoneyButton;
-    private JLabel sendMoneyText = new JLabel("Send money");
+    private final JLabel sendMoneyText = new JLabel("Send money");
     private Bank bank;
     private String[] createPaymentInputData;
 
 
     public UI() {
+        Container container = frame.getContentPane();
         container.setLayout(null);
         setClock();
         setBankInfo();
@@ -111,16 +113,15 @@ public class UI extends Thread {
         this.bank = bank;
     }
 
-
     public void addRow(boolean processed, BankOrder bankOrder, long before, long after) {
         String from = bankOrder.getFrom() == null ? "" : bankOrder.getFrom().getOwner().getName();
         String to = bankOrder.getTo() == null ? "" : bankOrder.getTo().getOwner().getName();
-
         if (processed) {
-            processedOrdersModel.addRow(new Object[]{bankOrder.getTime().format(DateTimeFormatter.ofPattern("HH:mm d.M.y")), bankOrder.getId(), bankOrder.getType(), bankOrder.getAmount(), from, to, before, after});
+            processedOrdersModel.addRow(new Object[]{bankOrder.getTime().format(TIME_FORMATTER), bankOrder.getId(), bankOrder.getType(), bankOrder.getAmount(), from, to, before, after});
         } else {
-            awaitingOrdersModel.addRow(new Object[]{bankOrder.getTime().format(DateTimeFormatter.ofPattern("HH:mm d.M.y")), bankOrder.getId(), bankOrder.getType(), bankOrder.getAmount(), from, to, bankOrder.getFrom().getBalance()});
+            awaitingOrdersModel.addRow(new Object[]{bankOrder.getTime().format(DATE_TIME_FORMATTER), bankOrder.getId(), bankOrder.getType(), bankOrder.getAmount(), from, to, bankOrder.getFrom().getBalance()});
         }
+        changeBalance(bankOrder);
     }
 
     public void removeRow(int id) {
@@ -132,13 +133,13 @@ public class UI extends Thread {
         }
     }
 
-    public void changeBalance(BankOrder order) {
+    public void changeBalance(BankOrder bankOrder) {
         for (int i = 0; i < awaitingOrdersModel.getRowCount(); i++) {
-            if (order.getFrom() != null && awaitingOrdersModel.getValueAt(i, 4).equals(order.getFrom().getOwner().getName())) {
-                awaitingOrdersModel.setValueAt(order.getFrom().getBalance(), i, 6);
+            if (bankOrder.getFrom() != null && awaitingOrdersModel.getValueAt(i, 5).equals(bankOrder.getFrom().getOwner().getName())) {
+                awaitingOrdersModel.setValueAt(bankOrder.getFrom().getBalance(), i, 6);
             }
-            if (order.getTo() != null && awaitingOrdersModel.getValueAt(i, 4).equals(order.getTo().getOwner().getName())) {
-                awaitingOrdersModel.setValueAt(order.getTo().getBalance(), i, 6);
+            if (bankOrder.getTo() != null && bankOrder.getFrom() == null && awaitingOrdersModel.getValueAt(i, 4).equals(bankOrder.getTo().getOwner().getName())) {
+                awaitingOrdersModel.setValueAt(bankOrder.getTo().getBalance(), i, 6);
             }
         }
     }
@@ -154,7 +155,6 @@ public class UI extends Thread {
 
     @Override
     public void run() {
-
         while (true) {
             setTableData();
             try {

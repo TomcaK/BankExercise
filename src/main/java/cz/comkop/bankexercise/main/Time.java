@@ -11,17 +11,16 @@ import java.time.format.DateTimeFormatter;
 public class Time implements Runnable {
     private Bank bank;
     private UI ui;
-    private int hour = 2000;
+    private final int hour = 2000;
     private LocalDateTime time = LocalDateTime.of(LocalDate.now(), LocalTime.of(LocalTime.now().getHour(), 00));
-    private long millis = System.currentTimeMillis();
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-    private DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("HH:mm d.M.y");
+    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm d.M.y");
 
     @Override
     public void run() {
-        System.out.println(time.format(formatter2));
+        System.out.println(time.format(DATE_TIME_FORMATTER));
         while (true) {
-            ui.setTimeLabel(time.format(formatter2));
+            ui.setTimeLabel(time.format(DATE_TIME_FORMATTER));
             try {
                 Thread.sleep(hour);
             } catch (InterruptedException e) {
@@ -29,9 +28,9 @@ public class Time implements Runnable {
             }
             time = time.plusHours(1);
             if (time.getHour() == 0) {
-                System.out.println(time.format(formatter2));
+                System.out.println(time.format(DATE_TIME_FORMATTER));
             } else {
-                System.out.println(time.format(formatter));
+                System.out.println(time.format(TIME_FORMATTER));
             }
             if (time.getHour() >= 7 && time.getHour() <= 18) {
                 ui.setOpenCloseLabel("OPENED");

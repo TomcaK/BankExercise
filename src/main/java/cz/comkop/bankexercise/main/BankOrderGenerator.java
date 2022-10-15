@@ -22,9 +22,6 @@ public class BankOrderGenerator extends Thread {
         while (true) {
             try {
                 sleep(random.nextInt(500, 6000));
-                if (Main.debug) {
-                    System.out.println("bank.Bank Generator Thread sleeps");
-                }
             } catch (InterruptedException e) {
             }
             randomTypes = random.nextInt(1, 4);

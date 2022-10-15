@@ -3,6 +3,8 @@ package cz.comkop.bankexercise.bank;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static cz.comkop.bankexercise.main.Time.DATE_TIME_FORMATTER;
+
 public class BankOrder {
     public enum OrderType {
         WITHDRAW, DEPOSIT, PAYMENT
@@ -14,6 +16,8 @@ public class BankOrder {
     private final Account from;
     private final Account to;
     private LocalDateTime time;
+
+    private boolean processed;
 
     public BankOrder(int id, int amount, Account from, Account to, LocalDateTime time) {
         this.id = id;
@@ -28,6 +32,14 @@ public class BankOrder {
             type = OrderType.PAYMENT;
         }
         this.time = time;
+    }
+
+    public boolean isProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(boolean processed) {
+        this.processed = processed;
     }
 
     public void setTime(LocalDateTime time) {
@@ -69,7 +81,7 @@ public class BankOrder {
         if (this.to != null) {
             to = "to " + this.to.getOwner().getName();
         }
-        return String.format("%s, id: %s,type: %s, amount: %d Kč %s %s", time.format(DateTimeFormatter.ofPattern("H:mm d.M.y")), id, type, amount, from, to);
+        return String.format("%s, id: %s,type: %s, amount: %d Kč %s %s", time.format(DATE_TIME_FORMATTER), id, type, amount, from, to);
     }
     public static BankOrderBuilder builder(){
         return new BankOrderBuilder();

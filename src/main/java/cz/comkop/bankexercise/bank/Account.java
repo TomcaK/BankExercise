@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Account {
-    private int number;
+    private final int number;
     private long balance;
 
     public enum AccountType {
@@ -14,7 +14,7 @@ public class Account {
 
     private AccountType type;
     private double interestRate;
-    private Owner owner;
+    private final Owner owner;
     private List<BankOrder> historyOfBankOrders;
 
 
