@@ -11,10 +11,10 @@ public class Main {
     private static UI ui = new UI();
 
     public static void main(String[] args) {
-        time.setAll(bank,ui);
-        bank.setAll(time,ui);
-        ui.setAll(bank);
-        bankOrderGenerator.setGenerator(bank,time);
+        time.setInstances(bank,ui);
+        bank.setInstances(time,ui);
+        ui.setInstances(bank);
+        bankOrderGenerator.setInstances(bank,time);
         bankOrderGenerator.start();
         bank.start();
         Thread t = new Thread(time);

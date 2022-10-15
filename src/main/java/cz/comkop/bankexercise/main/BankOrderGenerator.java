@@ -1,8 +1,6 @@
 package cz.comkop.bankexercise.main;
 
 
-
-
 import cz.comkop.bankexercise.bank.Account;
 import cz.comkop.bankexercise.bank.Bank;
 import cz.comkop.bankexercise.bank.BankOrder;
@@ -12,16 +10,15 @@ import java.util.Random;
 
 
 public class BankOrderGenerator extends Thread {
-    Bank bank;
-    Time time;
-    BankServer server;
-    int randomTypes;
-    int id = 1;
+    private Bank bank;
+    private Time time;
+    private BankServer server = BankServer.getInstance();
+    private int randomTypes;
+    private int id = 1;
 
     @Override
     public void run() {
         Random random = new Random();
-
         while (true) {
             try {
                 sleep(random.nextInt(500, 6000));
@@ -29,8 +26,6 @@ public class BankOrderGenerator extends Thread {
                     System.out.println("bank.Bank Generator Thread sleeps");
                 }
             } catch (InterruptedException e) {
-                //nic se nedeje, tak pospim o neco mene
-               // throw new RuntimeException(e);
             }
             randomTypes = random.nextInt(1, 4);
             Account from;
@@ -45,26 +40,19 @@ public class BankOrderGenerator extends Thread {
                 case 1 -> from = null;
                 case 2 -> to = null;
             }
-            BankOrder order = new BankOrder
-                    .BankOrderCreator()
+            server.receive(BankOrder.builder()
                     .setId(id++)
                     .setAmount(random.nextInt(1, 20000))
                     .setFrom(from)
                     .setTo(to)
                     .setTime(time.getTime())
-                    .createBankOrder();
-            server.receive(order);
-            if (Main.debug) {
-                System.out.println("Event created");
-                System.out.println(order);
-            }
+                    .build());
         }
     }
 
 
-    public void setGenerator(Bank bank, Time time) {
+    public void setInstances(Bank bank, Time time) {
         this.bank = bank;
-        this.server = bank.getServer();
         this.time = time;
     }
 }

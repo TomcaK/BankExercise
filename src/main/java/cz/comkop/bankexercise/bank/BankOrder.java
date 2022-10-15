@@ -71,8 +71,11 @@ public class BankOrder {
         }
         return String.format("%s, id: %s,type: %s, amount: %d Kč %s %s", time.format(DateTimeFormatter.ofPattern("H:mm d.M.y")), id, type, amount, from, to);
     }
+    public static BankOrderBuilder builder(){
+        return new BankOrderBuilder();
+    }
 
-    public static class BankOrderCreator {
+    public static class BankOrderBuilder {
 
         private int id;
         private int amount;
@@ -80,32 +83,34 @@ public class BankOrder {
         private Account to;
         private LocalDateTime time;
 
-        public BankOrderCreator setId(int id) {
+
+
+        public BankOrderBuilder setId(int id) {
             this.id = id;
             return this;
         }
 
-        public BankOrderCreator setAmount(int amount) {
+        public BankOrderBuilder setAmount(int amount) {
             this.amount = amount;
             return this;
         }
 
-        public BankOrderCreator setFrom(Account from) {
+        public BankOrderBuilder setFrom(Account from) {
             this.from = from;
             return this;
         }
 
-        public BankOrderCreator setTo(Account to) {
+        public BankOrderBuilder setTo(Account to) {
             this.to = to;
             return this;
         }
 
-        public BankOrderCreator setTime(LocalDateTime time) {
+        public BankOrderBuilder setTime(LocalDateTime time) {
             this.time = time;
             return this;
         }
 
-        public BankOrder createBankOrder() {
+        public BankOrder build() {
             return new BankOrder(id, amount, from, to,time);
         }
     }

@@ -30,8 +30,7 @@ public class UI extends Thread {
     private JButton sendMoneyButton;
     private JLabel sendMoneyText = new JLabel("Send money");
     private Bank bank;
-    private String[] sendMoneyData;
-
+    private String[] createPaymentInputData;
 
 
     public UI() {
@@ -94,29 +93,23 @@ public class UI extends Thread {
         return false;
     }
 
-    public void setMoneySender(){
+    public void setMoneySender() {
         amountTextField = new JTextField("Amount");
         nameTextField = new JTextField("Name");
         sendMoneyButton = new JButton("Send");
-        sendMoneyText.setBounds(400,500,100,20);
-        nameTextField.setBounds(400,520,100,20);
-        amountTextField.setBounds(400,540,100,20);
-        sendMoneyButton.setBounds(400,560,100,20);
-        sendMoneyButton.addActionListener((e)->{
-            sendMoneyData = new String[]{nameTextField.getText(),amountTextField.getText()};
-            bank.sendMoney(sendMoneyData);
-            //sendMoneyData = null;
+        sendMoneyText.setBounds(400, 500, 100, 20);
+        nameTextField.setBounds(400, 520, 100, 20);
+        amountTextField.setBounds(400, 540, 100, 20);
+        sendMoneyButton.setBounds(400, 560, 100, 20);
+        sendMoneyButton.addActionListener((e) -> {
+            createPaymentInputData = new String[]{nameTextField.getText(), amountTextField.getText()};
+            bank.createPayment(createPaymentInputData);
         });
     }
 
-    public void setAll(Bank bank){
+    public void setInstances(Bank bank) {
         this.bank = bank;
-}
-
-
-
-
-
+    }
 
 
     public void addRow(boolean processed, BankOrder bankOrder, long before, long after) {

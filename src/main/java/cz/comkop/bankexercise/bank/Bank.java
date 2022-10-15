@@ -17,8 +17,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
+
 public class Bank extends Thread {
-    private BankServer server = new BankServer();
+    private BankServer server = BankServer.getInstance();
     private List<Account> accounts = new ArrayList<>();
     private static boolean opened;
     private Time time;
@@ -55,17 +56,28 @@ public class Bank extends Thread {
     }
 
     public void createPayment(Account from, Account to) {
-
         Scanner scanner = new Scanner(System.in);
         System.out.println("Insert amount of payment");
         int amount = scanner.nextInt();
         if (amount <= from.getBalance()) {
             //  paymentOperation(new bank.BankOrder(amount, from, to));
-            System.out.println("bank.BankOrder successful");
+            System.out.println("BankOrder successful");
         } else {
-            System.out.println("bank.BankOrder unsuccessful");
+            System.out.println("BankOrder unsuccessful");
         }
 
+    }
+
+    public void createPayment(String[] data) {
+        for (Account acc : accounts) {
+            if (acc.getOwner().getName().equals(data[0])) {
+                server.receive(BankOrder.builder()
+                        .setTo(acc)
+                        .setAmount(Integer.parseInt(data[1]))
+                        .build());
+                break;
+            }
+        }
     }
 
     public void createPayment(int fromAccNumber, int toAccNumber) {
@@ -82,15 +94,14 @@ public class Bank extends Thread {
         System.out.println("Insert amount of payment");
         int amount = scanner.nextInt();
         if (amount <= accounts.get(fromAccIndex).getBalance()) {
-            orderOperations(new BankOrder
-                    .BankOrderCreator()
+            orderOperations (BankOrder.builder()
                     .setAmount(amount)
                     .setFrom(accounts.get(fromAccIndex))
                     .setTo(accounts.get(toAccIndex))
-                    .createBankOrder());
-            System.out.println("bank.BankOrder successful");
+                    .build());
+            System.out.println("BankOrder successful");
         } else {
-            System.out.println("bank.BankOrder unsuccessful");
+            System.out.println("BankOrder unsuccessful");
         }
     }
 
@@ -101,37 +112,34 @@ public class Bank extends Thread {
         return true;
     }
 
-
-    private boolean orderOperations(BankOrder bankOrder) {
-        Owner owner;
+    private void orderOperations(BankOrder bankOrder) {
         bankOrder.setTime(time.getTime());
+        Owner owner1 = bankOrder.getFrom() != null ? bankOrder.getFrom().getOwner() : null;
+        Owner owner2 = bankOrder.getTo() != null ? bankOrder.getTo().getOwner() : null;
+        long balanceBefore;
+        if (bankOrder.getType().equals(BankOrder.OrderType.WITHDRAW) || bankOrder.getType().equals(BankOrder.OrderType.PAYMENT)) {
+            balanceBefore = bankOrder.getFrom().getBalance();
+            ui.addRow(true, bankOrder, balanceBefore, bankOrder.getFrom().getBalance());
+        } else {
+            balanceBefore = bankOrder.getTo().getBalance();
+            ui.addRow(true, bankOrder, balanceBefore, bankOrder.getTo().getBalance());
+        }
         switch (bankOrder.getType()) {
             case DEPOSIT -> {
-                long balanceBefore = bankOrder.getTo().getBalance();
                 increaseBalance(bankOrder);
-                owner = bankOrder.getTo().getOwner();
-                ui.addRow(true, bankOrder, balanceBefore, bankOrder.getTo().getBalance());
-                System.out.printf("%s %s deposits %s Kč to account n.%s. Account balance before order: %s Kč. New account balance: %s Kč\n", owner.getClass().getSimpleName(), owner.getName(), bankOrder.getAmount(), bankOrder.getTo().getNumber(), balanceBefore, bankOrder.getTo().getBalance());
+                System.out.printf("%s %s deposits %s Kč to account n.%s. Account balance before order: %s Kč. New account balance: %s Kč\n", owner2.getClass().getSimpleName(), owner2.getName(), bankOrder.getAmount(), bankOrder.getTo().getNumber(), balanceBefore, bankOrder.getTo().getBalance());
             }
             case PAYMENT -> {
-                long balanceBefore = bankOrder.getFrom().getBalance();
                 decreaseBalance(bankOrder);
                 increaseBalance(bankOrder);
-                owner = bankOrder.getFrom().getOwner();
-                Owner owner2 = bankOrder.getTo().getOwner();
-                ui.addRow(true, bankOrder, balanceBefore, bankOrder.getFrom().getBalance());
-                System.out.printf("%s %s sends %s Kč from account n.%s to %s, account n.%s. Account balance before order: %s Kč. New account balance: %s Kč\n", owner.getClass().getSimpleName(), owner.getName(), bankOrder.getAmount(), bankOrder.getFrom().getNumber(), owner2.getName(), bankOrder.getTo().getNumber(), balanceBefore, bankOrder.getFrom().getBalance());
+                System.out.printf("%s %s sends %s Kč from account n.%s to %s, account n.%s. Account balance before order: %s Kč. New account balance: %s Kč\n", owner1.getClass().getSimpleName(), owner1.getName(), bankOrder.getAmount(), bankOrder.getFrom().getNumber(), owner2.getName(), bankOrder.getTo().getNumber(), balanceBefore, bankOrder.getFrom().getBalance());
 
             }
             case WITHDRAW -> {
-                long balanceBefore = bankOrder.getFrom().getBalance();
                 decreaseBalance(bankOrder);
-                owner = bankOrder.getFrom().getOwner();
-                ui.addRow(true, bankOrder, balanceBefore, bankOrder.getFrom().getBalance());
-                System.out.printf("%s %s withdraws %s Kč from account n.%s. Account balance before order: %s Kč. New account balance: %s Kč\n", owner.getClass().getSimpleName(), owner.getName(), bankOrder.getAmount(), bankOrder.getFrom().getNumber(), balanceBefore, bankOrder.getFrom().getBalance());
+                System.out.printf("%s %s withdraws %s Kč from account n.%s. Account balance before order: %s Kč. New account balance: %s Kč\n", owner1.getClass().getSimpleName(), owner1.getName(), bankOrder.getAmount(), bankOrder.getFrom().getNumber(), balanceBefore, bankOrder.getFrom().getBalance());
             }
         }
-        return true;
     }
 
     public void decreaseBalance(BankOrder bankOrder) {
@@ -166,7 +174,7 @@ public class Bank extends Thread {
                 }
             } else {
                 try {
-                    sleep(2000);
+                    sleep(100);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -197,17 +205,15 @@ public class Bank extends Thread {
         accounts.forEach(account -> {
             try {
                 Files.write(file.toPath(), (account.getOwner().getClass().getSimpleName() + " " + account.getOwner().getName() + "\n" + account + "\n****Today's orders****\n").getBytes(), StandardOpenOption.APPEND);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            account.getHistoryOfPayments().stream().filter(bankOrder -> bankOrder.getTime().toLocalDate() == dateTime.toLocalDate()).forEach(bankOrder -> {
-                try {
-                    Files.write(file.toPath(), (bankOrder + "\n").getBytes(), StandardOpenOption.APPEND);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            try {
+                account.getHistoryOfPayments()
+                        .stream()
+                        .filter(bankOrder -> bankOrder.getTime().toLocalDate() == dateTime.toLocalDate()).forEach(bankOrder -> {
+                            try {
+                                Files.write(file.toPath(), (bankOrder + "\n").getBytes(), StandardOpenOption.APPEND);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
                 Files.write(file.toPath(), ("-----------------------------------------------------------------------\n\n\n").getBytes(), StandardOpenOption.APPEND);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -219,19 +225,9 @@ public class Bank extends Thread {
                 for (int i = 0; i < server.size(); i++) {
                     Files.write(file.toPath(), (server.get(i) + "\n").getBytes(), StandardOpenOption.APPEND);
                 }
-
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    public void sendMoney(String[] data) {
-        for (Account acc : accounts) {
-            if (acc.getOwner().getName().equals(data[0])) {
-                server.addOrder(acc, Integer.parseInt(data[1]));
-                break;
-            }
         }
     }
 
@@ -242,7 +238,8 @@ public class Bank extends Thread {
             int count = 0;
             for (int i = 0; i < server.size(); i++) {
                 ui.changeBalance(server.get(i));
-                if (checkBalance(server.get(i)) && orderOperations(server.get(i))) {
+                if (checkBalance(server.get(i))) {
+                    orderOperations(server.get(i));
                     ui.removeRow(server.get(i).getId());
                     server.operationComplete(i);
                     i--;
@@ -255,11 +252,7 @@ public class Bank extends Thread {
         }
     }
 
-    public BankServer getServer() {
-        return server;
-    }
-
-    public void setAll(Time time, UI ui) {
+    public void setInstances(Time time, UI ui) {
         this.time = time;
         this.ui = ui;
     }

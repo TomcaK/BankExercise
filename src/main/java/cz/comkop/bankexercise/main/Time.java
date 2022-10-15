@@ -11,8 +11,6 @@ import java.time.format.DateTimeFormatter;
 public class Time implements Runnable {
     private Bank bank;
     private UI ui;
-
-
     private int hour = 2000;
     private LocalDateTime time = LocalDateTime.of(LocalDate.now(), LocalTime.of(LocalTime.now().getHour(), 00));
     private long millis = System.currentTimeMillis();
@@ -54,7 +52,7 @@ public class Time implements Runnable {
         }
     }
 
-    public void setAll(Bank bank, UI ui) {
+    public void setInstances(Bank bank, UI ui) {
         this.bank = bank;
         this.ui = ui;
     }
