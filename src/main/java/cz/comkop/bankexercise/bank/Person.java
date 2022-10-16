@@ -2,7 +2,7 @@ package cz.comkop.bankexercise.bank;
 
 import java.time.LocalDate;
 
-public class Person extends Owner {
+public class Person implements Owner {
     private String name, surname;
     private LocalDate dateOfBirth;
 

@@ -1,6 +1,6 @@
 package cz.comkop.bankexercise.bank;
 
-public class Company extends Owner {
+public class Company implements Owner {
     private String name;
     private int yearOfFoundation;
 
