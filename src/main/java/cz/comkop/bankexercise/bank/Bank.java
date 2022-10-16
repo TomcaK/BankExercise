@@ -4,6 +4,7 @@ package cz.comkop.bankexercise.bank;
 import cz.comkop.bankexercise.main.Time;
 import cz.comkop.bankexercise.main.UI;
 
+import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
+
+import static cz.comkop.bankexercise.main.Time.HOUR;
 
 
 public class Bank extends Thread {
@@ -155,12 +158,23 @@ public class Bank extends Thread {
         bankOrder.getTo().setBalance(bankOrder.getTo().getBalance() + bankOrder.getAmount());
     }
 
-    public void setOpen(boolean o) {
-        opened = o;
-    }
-
-
-    public static boolean isOpened() {
+    private boolean isOpened() {
+        if (time.getTime().getHour() >= 7 && time.getTime().getHour() <= 18) {
+            ui.setOpenCloseLabel("OPENED");
+            if (!opened) {
+                System.out.println("****Good Morning!!!****");
+                System.out.println("****BANK OPENED****");
+            }
+            opened = true;
+        } else {
+            ui.setOpenCloseLabel("CLOSED");
+            if (opened) {
+                System.out.println("****Have a nice evening!!!****");
+                System.out.println("****BANK CLOSED****");
+                dailyReport(time.getTime());
+            }
+            opened = false;
+        }
         return opened;
     }
 
@@ -168,10 +182,10 @@ public class Bank extends Thread {
     @Override
     public void run() {
         while (true) {
-            if (opened) {
+            if (isOpened()) {
                 paymentListener();
                 try {
-                    sleep(2000);
+                    sleep(HOUR);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -201,7 +215,9 @@ public class Bank extends Thread {
                     file.createNewFile();
                 }
             }
-            System.out.println("****Daily report " + name + " created in " + reportsDirectoryPath + "****");
+            String reportText = "****Daily report " + name + " created in " + reportsDirectoryPath + "****";
+            ui.setReportText(reportText);
+            System.out.println(reportText);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -234,6 +250,7 @@ public class Bank extends Thread {
         }
     }
 
+
     private void paymentListener() {
         if (!server.isEmpty()) {
             int size = server.size();
@@ -248,6 +265,7 @@ public class Bank extends Thread {
                     ui.addRow(false, bankOrder, 0, 0);
                 }
             });
+            accounts.forEach(account -> ui.checkBalance(account.getOwner().getName(),account.getBalance()));
             server.removeProcessedOrder();
 
 //            for (int i = 0; i < server.size(); i++) {
@@ -261,10 +279,9 @@ public class Bank extends Thread {
 //                    ui.addRow(false, server.get(i), 0, 0);
 //                }
 //            }
-          //  System.out.printf("Orders processed: %s\n\n", count);
+            //  System.out.printf("Orders processed: %s\n\n", count);
         }
     }
-
 
 
     public void setInstances(Time time, UI ui) {

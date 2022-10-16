@@ -1,23 +1,24 @@
 package cz.comkop.bankexercise.main;
 
+import cz.comkop.bankexercise.bank.Account;
 import cz.comkop.bankexercise.bank.Bank;
 import cz.comkop.bankexercise.bank.BankOrder;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.time.format.DateTimeFormatter;
 
 import static cz.comkop.bankexercise.main.Time.*;
 
 public class UI extends Thread {
     private final JFrame frame = new JFrame("Bank Exercise");
-    private final JLabel timeLabel = new JLabel();
+    private final JLabel clockText = new JLabel();
     private final JLabel timeText = new JLabel("Time");
     private final JLabel bankText = new JLabel("Bank");
     private final JLabel openClosedText = new JLabel();
     private final JLabel awaitingOrdersText = new JLabel("Awaiting orders");
     private final JLabel processedOrdersText = new JLabel("Processed orders");
+    private final JLabel reportText = new JLabel();
     private JTable awaitingOrdersTable;
     private JTable processedOrdersTable;
     private DefaultTableModel awaitingOrdersModel;
@@ -37,13 +38,13 @@ public class UI extends Thread {
     public UI() {
         Container container = frame.getContentPane();
         container.setLayout(null);
-        setClock();
-        setBankInfo();
+        setTextLabels();
         setTables();
         setMoneySender();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        container.add(reportText);
         container.add(timeText);
-        container.add(timeLabel);
+        container.add(clockText);
         container.add(bankText);
         container.add(openClosedText);
         container.add(awaitingOrdersText);
@@ -56,6 +57,10 @@ public class UI extends Thread {
         container.add(nameTextField);
         frame.setSize(1900, 1000);
         frame.setVisible(true);
+    }
+
+    public void setReportText(String s){
+        reportText.setText(s);
     }
 
     private void setTables() {
@@ -71,15 +76,15 @@ public class UI extends Thread {
         jScrollPaneProcessed.setBounds(800, 60, 1050, 800);
     }
 
-    private void setBankInfo() {
+    private void setTextLabels() {
         bankText.setBounds(725, 0, 50, 20);
         openClosedText.setBounds(725, 20, 50, 20);
+        timeText.setBounds(1300, 0, 50, 20);
+        clockText.setBounds(1300, 20, 100, 20);
+        reportText.setBounds(5,400,1000,20);
     }
 
-    private void setClock() {
-        timeText.setBounds(1300, 0, 50, 20);
-        timeLabel.setBounds(1300, 20, 100, 20);
-    }
+
 
     private void setTableData() {
         awaitingOrdersTable.setModel(awaitingOrdersModel);
@@ -113,6 +118,8 @@ public class UI extends Thread {
         this.bank = bank;
     }
 
+
+
     public void addRow(boolean processed, BankOrder bankOrder, long before, long after) {
         String from = bankOrder.getFrom() == null ? "" : bankOrder.getFrom().getOwner().getName();
         String to = bankOrder.getTo() == null ? "" : bankOrder.getTo().getOwner().getName();
@@ -121,7 +128,6 @@ public class UI extends Thread {
         } else {
             awaitingOrdersModel.addRow(new Object[]{bankOrder.getTime().format(DATE_TIME_FORMATTER), bankOrder.getId(), bankOrder.getType(), bankOrder.getAmount(), from, to, bankOrder.getFrom().getBalance()});
         }
-        changeBalance(bankOrder);
     }
 
     public void removeRow(int id) {
@@ -133,19 +139,28 @@ public class UI extends Thread {
         }
     }
 
-    public void changeBalance(BankOrder bankOrder) {
+    public void checkBalance(String name, long balance) {
         for (int i = 0; i < awaitingOrdersModel.getRowCount(); i++) {
-            if (bankOrder.getFrom() != null && awaitingOrdersModel.getValueAt(i, 5).equals(bankOrder.getFrom().getOwner().getName())) {
-                awaitingOrdersModel.setValueAt(bankOrder.getFrom().getBalance(), i, 6);
-            }
-            if (bankOrder.getTo() != null && bankOrder.getFrom() == null && awaitingOrdersModel.getValueAt(i, 4).equals(bankOrder.getTo().getOwner().getName())) {
-                awaitingOrdersModel.setValueAt(bankOrder.getTo().getBalance(), i, 6);
+            if (awaitingOrdersModel.getValueAt(i, 4).equals(name)  && Long.parseLong(awaitingOrdersModel.getValueAt(i, 6).toString()) != balance){
+                awaitingOrdersModel.setValueAt(balance, i, 6);
             }
         }
+
+//        for (int i = 0; i < awaitingOrdersModel.getRowCount(); i++) {
+//            if (bankOrder.getType().equals(BankOrder.OrderType.PAYMENT)) {
+//                if (awaitingOrdersModel.getValueAt(i, 5).equals(bankOrder.getFrom().getOwner().getName()) || awaitingOrdersModel.getValueAt(i, 5).equals(bankOrder.getTo().getOwner().getName())){
+//
+//                }
+//                awaitingOrdersModel.setValueAt(bankOrder.getFrom().getBalance(), i, 6);
+//            }
+//            if (bankOrder.getType().equals(BankOrder.OrderType.DEPOSIT) && awaitingOrdersModel.getValueAt(i, 4).equals(bankOrder.getTo().getOwner().getName())) {
+//                awaitingOrdersModel.setValueAt(bankOrder.getTo().getBalance(), i, 6);
+//            }
+//        }
     }
 
-    public void setTimeLabel(String s) {
-        timeLabel.setText(s);
+    public void setClockText(String s) {
+        clockText.setText(s);
     }
 
     public void setOpenCloseLabel(String s) {

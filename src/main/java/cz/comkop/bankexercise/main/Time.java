@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 public class Time implements Runnable {
     private Bank bank;
     private UI ui;
-    private final int hour = 2000;
+    public final static int HOUR = 2000;
     private LocalDateTime time = LocalDateTime.of(LocalDate.now(), LocalTime.of(LocalTime.now().getHour(), 00));
     public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm d.M.y");
@@ -20,9 +20,9 @@ public class Time implements Runnable {
     public void run() {
         System.out.println(time.format(DATE_TIME_FORMATTER));
         while (true) {
-            ui.setTimeLabel(time.format(DATE_TIME_FORMATTER));
+            ui.setClockText(time.format(DATE_TIME_FORMATTER));
             try {
-                Thread.sleep(hour);
+                Thread.sleep(HOUR);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -31,22 +31,6 @@ public class Time implements Runnable {
                 System.out.println(time.format(DATE_TIME_FORMATTER));
             } else {
                 System.out.println(time.format(TIME_FORMATTER));
-            }
-            if (time.getHour() >= 7 && time.getHour() <= 18) {
-                ui.setOpenCloseLabel("OPENED");
-                if (!Bank.isOpened()) {
-                    System.out.println("****Good Morning!!!****");
-                    System.out.println("****BANK OPENED****");
-                }
-                bank.setOpen(true);
-            } else {
-                ui.setOpenCloseLabel("CLOSED");
-                if (Bank.isOpened()) {
-                    System.out.println("****Have a nice evening!!!****");
-                    System.out.println("****BANK CLOSED****");
-                    bank.dailyReport(time);
-                }
-                bank.setOpen(false);
             }
         }
     }
