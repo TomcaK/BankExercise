@@ -1,9 +1,8 @@
-package cz.comkop.bankexercise.bank;
+package cz.comkop.exercises.bankexercise.bank;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class BankServer {
     private static BankServer bankServer;

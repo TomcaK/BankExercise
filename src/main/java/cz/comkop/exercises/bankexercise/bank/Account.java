@@ -1,4 +1,4 @@
-package cz.comkop.bankexercise.bank;
+package cz.comkop.exercises.bankexercise.bank;
 
 
 import java.util.ArrayList;

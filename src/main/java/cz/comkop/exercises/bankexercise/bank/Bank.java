@@ -1,10 +1,9 @@
-package cz.comkop.bankexercise.bank;
+package cz.comkop.exercises.bankexercise.bank;
 
 
-import cz.comkop.bankexercise.main.Time;
-import cz.comkop.bankexercise.main.UI;
+import cz.comkop.exercises.bankexercise.main.Time;
+import cz.comkop.exercises.bankexercise.main.UI;
 
-import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,7 +17,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
-import static cz.comkop.bankexercise.main.Time.HOUR;
+import static cz.comkop.exercises.bankexercise.main.Time.HOUR;
 
 
 public class Bank extends Thread {

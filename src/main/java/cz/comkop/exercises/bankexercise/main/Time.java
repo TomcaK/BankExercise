@@ -1,7 +1,7 @@
-package cz.comkop.bankexercise.main;
+package cz.comkop.exercises.bankexercise.main;
 
 
-import cz.comkop.bankexercise.bank.Bank;
+import cz.comkop.exercises.bankexercise.bank.Bank;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

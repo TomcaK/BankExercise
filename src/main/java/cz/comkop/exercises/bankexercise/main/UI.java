@@ -1,14 +1,11 @@
-package cz.comkop.bankexercise.main;
+package cz.comkop.exercises.bankexercise.main;
 
-import cz.comkop.bankexercise.bank.Account;
-import cz.comkop.bankexercise.bank.Bank;
-import cz.comkop.bankexercise.bank.BankOrder;
+import cz.comkop.exercises.bankexercise.bank.Bank;
+import cz.comkop.exercises.bankexercise.bank.BankOrder;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-
-import static cz.comkop.bankexercise.main.Time.*;
 
 public class UI extends Thread {
     private final JFrame frame = new JFrame("Bank Exercise");
@@ -124,9 +121,9 @@ public class UI extends Thread {
         String from = bankOrder.getFrom() == null ? "" : bankOrder.getFrom().getOwner().getName();
         String to = bankOrder.getTo() == null ? "" : bankOrder.getTo().getOwner().getName();
         if (processed) {
-            processedOrdersModel.addRow(new Object[]{bankOrder.getTime().format(TIME_FORMATTER), bankOrder.getId(), bankOrder.getType(), bankOrder.getAmount(), from, to, before, after});
+            processedOrdersModel.addRow(new Object[]{bankOrder.getTime().format(Time.TIME_FORMATTER), bankOrder.getId(), bankOrder.getType(), bankOrder.getAmount(), from, to, before, after});
         } else {
-            awaitingOrdersModel.addRow(new Object[]{bankOrder.getTime().format(DATE_TIME_FORMATTER), bankOrder.getId(), bankOrder.getType(), bankOrder.getAmount(), from, to, bankOrder.getFrom().getBalance()});
+            awaitingOrdersModel.addRow(new Object[]{bankOrder.getTime().format(Time.DATE_TIME_FORMATTER), bankOrder.getId(), bankOrder.getType(), bankOrder.getAmount(), from, to, bankOrder.getFrom().getBalance()});
         }
     }
 

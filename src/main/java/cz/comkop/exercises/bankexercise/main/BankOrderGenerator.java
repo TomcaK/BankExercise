@@ -1,10 +1,10 @@
-package cz.comkop.bankexercise.main;
+package cz.comkop.exercises.bankexercise.main;
 
 
-import cz.comkop.bankexercise.bank.Account;
-import cz.comkop.bankexercise.bank.Bank;
-import cz.comkop.bankexercise.bank.BankOrder;
-import cz.comkop.bankexercise.bank.BankServer;
+import cz.comkop.exercises.bankexercise.bank.Account;
+import cz.comkop.exercises.bankexercise.bank.Bank;
+import cz.comkop.exercises.bankexercise.bank.BankOrder;
+import cz.comkop.exercises.bankexercise.bank.BankServer;
 
 import java.util.Random;
 

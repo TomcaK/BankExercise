@@ -1,9 +1,8 @@
-package cz.comkop.bankexercise.bank;
+package cz.comkop.exercises.bankexercise.bank;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-import static cz.comkop.bankexercise.main.Time.DATE_TIME_FORMATTER;
+import static cz.comkop.exercises.bankexercise.main.Time.DATE_TIME_FORMATTER;
 
 public class BankOrder {
     public enum OrderType {
