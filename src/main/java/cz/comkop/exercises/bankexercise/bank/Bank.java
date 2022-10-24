@@ -21,9 +21,9 @@ import static cz.comkop.exercises.bankexercise.main.Time.HOUR;
 
 
 public class Bank extends Thread {
+    private static boolean opened;
     private BankServer server = BankServer.getInstance();
     private List<Account> accounts = new ArrayList<>();
-    private static boolean opened;
     private Time time;
     private UI ui;
 
@@ -97,7 +97,7 @@ public class Bank extends Thread {
         System.out.println("Insert amount of payment");
         int amount = scanner.nextInt();
         if (amount <= accounts.get(fromAccIndex).getBalance()) {
-            orderOperations(BankOrder.builder()
+            orderOperation(BankOrder.builder()
                     .setAmount(amount)
                     .setFrom(accounts.get(fromAccIndex))
                     .setTo(accounts.get(toAccIndex))
@@ -115,7 +115,7 @@ public class Bank extends Thread {
         return true;
     }
 
-    private void orderOperations(BankOrder bankOrder) {
+    private void orderOperation(BankOrder bankOrder) {
         bankOrder.setTime(time.getTime());
         Owner owner1 = bankOrder.getFrom() != null ? bankOrder.getFrom().getOwner() : null;
         Owner owner2 = bankOrder.getTo() != null ? bankOrder.getTo().getOwner() : null;
@@ -198,7 +198,7 @@ public class Bank extends Thread {
         }
     }
 
-    public void dailyReport(LocalDateTime dateTime) {
+    private File createFile(LocalDateTime dateTime) {
         String name = String.format("%s.txt", dateTime.format(DateTimeFormatter.ofPattern("d.M.y")));
         String separator = System.getProperty("file.separator");
         String sourceDirectoryPath = System.getProperty("user.dir") + separator;
@@ -214,12 +214,17 @@ public class Bank extends Thread {
                     file.createNewFile();
                 }
             }
-            String reportText = "****Daily report " + name + " created in " + reportsDirectoryPath + "****";
-            ui.setReportText(reportText);
-            System.out.println(reportText);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        String reportText = "****Daily report " + name + " created in " + reportsDirectoryPath + "****";
+        ui.setReportText(reportText);
+        System.out.println(reportText);
+        return file;
+    }
+
+    public void dailyReport(LocalDateTime dateTime) {
+        File file = createFile(dateTime);
         accounts.forEach(account -> {
             try {
                 Files.write(file.toPath(), (account.getOwner().getClass().getSimpleName() + " " + account.getOwner().getName() + "\n" + account + "\n****Today's orders****\n").getBytes(), StandardOpenOption.APPEND);
@@ -254,31 +259,17 @@ public class Bank extends Thread {
         if (!server.isEmpty()) {
             int size = server.size();
             System.out.printf("Awaiting orders: %s\n", size);
-            int count = 0;
             server.getAwaitingBankOrders().forEach(bankOrder -> {
                 if (checkBalance(bankOrder)) {
-                    orderOperations(bankOrder);
+                    orderOperation(bankOrder);
                     bankOrder.setProcessed(true);
                     ui.removeRow(bankOrder.getId());
                 } else if (!ui.doesRowExist(bankOrder.getId())) {
                     ui.addRow(false, bankOrder, 0, 0);
                 }
             });
-            accounts.forEach(account -> ui.checkBalance(account.getOwner().getName(),account.getBalance()));
+            accounts.forEach(account -> ui.checkBalance(account.getOwner().getName(), account.getBalance()));
             server.removeProcessedOrder();
-
-//            for (int i = 0; i < server.size(); i++) {
-//
-//                if (checkBalance(server.get(i))) {
-//                    orderOperations(server.get(i));
-//                    server.removeProcessedOrders(i);
-//                    i--;
-//                    count++;
-//                } else if (!ui.doesRowExist(server.get(i).getId())) {
-//                    ui.addRow(false, server.get(i), 0, 0);
-//                }
-//            }
-            //  System.out.printf("Orders processed: %s\n\n", count);
         }
     }
 
