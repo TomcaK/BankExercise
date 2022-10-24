@@ -1,2 +1,2 @@
 # Exercises
-I created this repository to share codes which I created as homework from my JAVA course
+I created this repository to share codes which I created as homework for my JAVA course
