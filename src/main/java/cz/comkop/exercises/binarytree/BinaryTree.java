@@ -1,44 +1,29 @@
 package cz.comkop.exercises.binarytree;
 
+import java.util.Arrays;
+
 public class BinaryTree {
-    public static void main(String[] args) {
+    Node root;
 
-        BinaryTree binaryTree = new BinaryTree();
-        binaryTree.root = new Node(8);
-        binaryTree.root.left = new Node(3);
-        binaryTree.root.right = new Node(10);
-        binaryTree.root.left.left = new Node(1);
-        binaryTree.root.left.right = new Node(4);
-
-        Node node = binaryTree.binarySearch(4);
-        System.out.println(node);
-        BinaryTree fromArray = BinaryTree.getFromArray(new int[]{5, 6, 3, 2, 4, 9, 7});
-        Node node1 = fromArray.binarySearch(2);
-        System.out.println(node1);
-
-    }
-
-    //DU implement method to create binary tree from array
+    //implement method to create binary tree from array
     public static BinaryTree getFromArray(int[] array) {
         BinaryTree bt = new BinaryTree();
         bt.root = new Node(array[0]);
-        for (int i = 1; i < array.length; i++) {
-            getSuitableNode(array[i], bt.root);
-        }
+        Arrays.stream(array).skip(1).forEach(n -> setSuitableNode(n, bt.root));
         return bt;
     }
 
-    public static void getSuitableNode(int value, Node node) {
+    public static void setSuitableNode(int value, Node node) {
         if (node.value <= value) {
             if (node.right == null) {
                 node.right = new Node(value, node);
             } else {
-                getSuitableNode(value, node.right);
+                setSuitableNode(value, node.right);
             }
         } else if (node.left == null) {
             node.left = new Node(value, node);
         } else {
-            getSuitableNode(value, node.left);
+            setSuitableNode(value, node.left);
         }
     }
 
@@ -64,10 +49,7 @@ public class BinaryTree {
         }
     }
 
-    Node root;
-
     public static class Node {
-
         int value;
         Node parent;
         Node left;//mensi nez parent
@@ -75,7 +57,6 @@ public class BinaryTree {
 
         public Node(int value) {
             this.value = value;
-
         }
 
         public Node(int value, Node parent) {
@@ -87,5 +68,19 @@ public class BinaryTree {
         public String toString() {
             return String.valueOf(value);
         }
+    }
+
+    public static void main(String[] args) {
+        BinaryTree binaryTree = new BinaryTree();
+        binaryTree.root = new Node(8);
+        binaryTree.root.left = new Node(3);
+        binaryTree.root.right = new Node(10);
+        binaryTree.root.left.left = new Node(1);
+        binaryTree.root.left.right = new Node(4);
+        Node node = binaryTree.binarySearch(4);
+        System.out.println(node);
+        BinaryTree fromArray = BinaryTree.getFromArray(new int[]{5, 6, 3, 2, 4, 9, 7});
+        Node node1 = fromArray.binarySearch(2);
+        System.out.println(node1);
     }
 }
